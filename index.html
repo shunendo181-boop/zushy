@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zushy — 問い合わせ対応・リード獲得を24時間自動化</title>
+<meta name="description" content="Zushy は、問い合わせ対応・リード獲得を24時間自動化するAIチャットボットです。人員を増やさず、顧客対応をスケールさせましょう。" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<style>
+  :root {
+    --font-sans: 'Noto Sans JP','Hiragino Kaku Gothic ProN','Hiragino Sans',Meiryo,sans-serif;
+    --font-serif: 'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',serif;
+    --ink:          #1A1626;
+    --surface:      #F7F6FB;
+    --card:         #2D2540;
+    --accent:       #7C5CFC;
+    --lavender:     #C4B5FD;
+    --mid:          #4E4068;
+    --text-on-dark: #E8E4F8;
+    --muted:        #9B93B8;
+    --white:        #FFFFFF;
+    --radius:       14px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-sans);background:var(--surface);color:var(--ink);line-height:1.8;font-size:15px;-webkit-font-smoothing:antialiased}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(247,246,251,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(124,92,252,.12);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{font-family:var(--font-serif);font-size:1.5rem;color:var(--ink);text-decoration:none;letter-spacing:.02em;font-weight:700}
+  .logo span{color:var(--accent)}
+  nav a.nav-cta{background:var(--accent);color:var(--white);text-decoration:none;padding:9px 22px;border-radius:8px;font-size:.85rem;font-weight:600;transition:opacity .2s;white-space:nowrap}
+  nav a.nav-cta:hover{opacity:.85}
+
+  /* HERO */
+  .hero{background:var(--ink);min-height:92vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:80px 5%}
+  .hero-copy{padding-right:48px}
+  .hero-eyebrow{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.1em;color:var(--lavender);margin-bottom:24px;background:rgba(124,92,252,.15);padding:6px 14px;border-radius:100px;border:1px solid rgba(196,181,253,.25)}
+  .hero h1{font-family:var(--font-serif);font-size:clamp(2rem,3.8vw,3.2rem);line-height:1.4;letter-spacing:.01em;color:var(--white);margin-bottom:24px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--lavender)}
+  .hero-sub{font-size:1rem;color:var(--muted);line-height:1.9;margin-bottom:40px;max-width:440px}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .btn-primary{background:var(--accent);color:var(--white);text-decoration:none;padding:14px 30px;border-radius:10px;font-weight:600;font-size:.9rem;transition:transform .18s,opacity .18s;display:inline-block;white-space:nowrap}
+  .btn-primary:hover{transform:translateY(-1px);opacity:.9}
+  .btn-ghost{color:var(--lavender);text-decoration:none;font-size:.85rem;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:color .18s;white-space:nowrap}
+  .btn-ghost:hover{color:var(--white)}
+  .btn-ghost svg{width:16px;height:16px}
+
+  /* CHAT WIDGET */
+  .chat-mockup{background:var(--card);border-radius:20px;border:1px solid rgba(124,92,252,.25);overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04);max-width:420px;margin:0 auto;min-height:430px}
+  .chat-topbar{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07);padding:14px 18px;display:flex;align-items:center;gap:10px}
+  .chat-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--lavender));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:700;flex-shrink:0}
+  .chat-agent-name{font-size:.85rem;font-weight:600;color:var(--text-on-dark)}
+  .chat-status{font-size:.72rem;color:var(--muted)}
+  .online-dot{width:7px;height:7px;background:#5BE09A;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+  .chat-body{padding:20px 18px 18px;min-height:300px;display:flex;flex-direction:column;gap:14px}
+  .bubble-row{display:flex;gap:10px;align-items:flex-end}
+  .bubble-row.user{flex-direction:row-reverse}
+  .bubble{max-width:80%;padding:11px 15px;border-radius:14px;font-size:.82rem;line-height:1.75;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;will-change:opacity,transform}
+  .bubble.visible{opacity:1;transform:translateY(0)}
+  .bubble.bot{background:rgba(124,92,252,.18);color:var(--text-on-dark);border-bottom-left-radius:4px;border:1px solid rgba(124,92,252,.25)}
+  .bubble.user-msg{background:var(--accent);color:var(--white);border-bottom-right-radius:4px}
+  .bubble-mini-avatar{width:24px;height:24px;background:linear-gradient(135deg,var(--accent),var(--lavender));border-radius:50%;flex-shrink:0}
+  .typing-dots{display:flex;gap:4px;padding:12px 15px;background:rgba(124,92,252,.18);border:1px solid rgba(124,92,252,.25);border-radius:14px;border-bottom-left-radius:4px;opacity:0;width:fit-content;transition:opacity .3s}
+  .typing-dots.visible{opacity:1}
+  .typing-dots span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.2s ease-in-out infinite}
+  .typing-dots span:nth-child(2){animation-delay:.2s}
+  .typing-dots span:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+  .chat-input-bar{border-top:1px solid rgba(255,255,255,.07);padding:12px 18px;display:flex;align-items:center;gap:10px}
+  .chat-input-fake{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 13px;font-size:.8rem;color:var(--muted);font-family:var(--font-sans);min-height:36px}
+  .send-btn{width:32px;height:32px;background:var(--accent);border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .send-btn svg{width:14px;height:14px;fill:#fff}
+
+  /* TRUST STRIP */
+  .trust-strip{background:var(--white);border-top:1px solid rgba(124,92,252,.1);border-bottom:1px solid rgba(124,92,252,.1);padding:28px 5%;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center}
+  .trust-strip p{font-size:.85rem;color:var(--mid);font-weight:500}
+  .trust-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.15);border-radius:100px;padding:6px 14px;font-size:.78rem;font-weight:600;color:var(--accent);white-space:nowrap}
+
+  /* SHARED SECTION */
+  .section-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .section-title{font-family:var(--font-serif);font-size:clamp(1.6rem,2.8vw,2.4rem);line-height:1.4;letter-spacing:.02em;color:var(--ink);margin-bottom:16px;max-width:600px;font-weight:700}
+  .section-sub{font-size:.95rem;color:var(--mid);max-width:480px;line-height:1.9;margin-bottom:56px}
+
+  /* FEATURES */
+  .features{padding:96px 5%;max-width:1100px;margin:0 auto}
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .feature-card{background:var(--white);border:1px solid rgba(124,92,252,.12);border-radius:var(--radius);padding:28px;transition:border-color .22s,box-shadow .22s,transform .22s}
+  .feature-card:hover{border-color:rgba(124,92,252,.4);box-shadow:0 12px 32px rgba(124,92,252,.1);transform:translateY(-2px)}
+  .feature-icon{width:44px;height:44px;background:rgba(124,92,252,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:1.2rem}
+  .feature-card h3{font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.6}
+  .feature-card p{font-size:.84rem;color:var(--mid);line-height:1.85}
+
+  /* HOW IT WORKS */
+  .how{background:var(--ink);padding:96px 5%}
+  .how-inner{max-width:1100px;margin:0 auto}
+  .how .section-label{color:var(--lavender)}
+  .how .section-title{color:var(--white)}
+  .how .section-sub{color:var(--muted)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;position:relative}
+  .steps::before{content:'';position:absolute;top:28px;left:calc(16.66% + 20px);right:calc(16.66% + 20px);height:1px;background:linear-gradient(90deg,rgba(124,92,252,.5),rgba(124,92,252,.1),rgba(124,92,252,.5))}
+  .step{text-align:center}
+  .step-num{width:56px;height:56px;background:rgba(124,92,252,.15);border:1.5px solid rgba(124,92,252,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-family:var(--font-serif);font-size:1.2rem;color:var(--lavender);position:relative;z-index:1;font-weight:700}
+  .step h3{font-size:.975rem;font-weight:600;color:var(--text-on-dark);margin-bottom:10px;line-height:1.6}
+  .step p{font-size:.84rem;color:var(--muted);line-height:1.85}
+
+  /* CTA */
+  .cta-section{padding:96px 5%;text-align:center;max-width:760px;margin:0 auto}
+  .cta-section .section-title{margin:0 auto 16px;max-width:100%}
+  .cta-section .section-sub{margin:0 auto 40px}
+  .cta-group{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+  .btn-primary-large{background:var(--accent);color:var(--white);text-decoration:none;padding:16px 36px;border-radius:10px;font-weight:600;font-size:1rem;display:inline-block;transition:transform .18s,opacity .18s}
+  .btn-primary-large:hover{transform:translateY(-1px);opacity:.88}
+  .cta-note{font-size:.78rem;color:var(--muted);margin-top:18px}
+  .cta-trust{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:32px;padding-top:32px;border-top:1px solid rgba(124,92,252,.1)}
+  .cta-trust-item{display:flex;align-items:center;gap:7px;font-size:.82rem;color:var(--mid)}
+  .cta-trust-item svg{width:15px;height:15px;flex-shrink:0}
+
+  /* FOOTER */
+  footer{background:var(--ink);border-top:1px solid rgba(124,92,252,.15);padding:40px 5%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .footer-logo{font-family:var(--font-serif);font-size:1.25rem;color:var(--white);text-decoration:none;font-weight:700}
+  .footer-logo span{color:var(--lavender)}
+  .footer-links{display:flex;gap:24px}
+  .footer-links a{font-size:.82rem;color:var(--muted);text-decoration:none;transition:color .2s}
+  .footer-links a:hover{color:var(--lavender)}
+  footer p.copy{font-size:.78rem;color:var(--mid);width:100%}
+
+  /* MOBILE */
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr;padding:56px 6% 48px;text-align:center;min-height:unset}
+    .hero-copy{padding-right:0;margin-bottom:40px}
+    .hero-sub{margin:0 auto 40px}
+    .hero-actions{justify-content:center}
+    .chat-mockup{max-width:100%;min-height:unset}
+    .chat-body{min-height:240px}
+    .features{padding:64px 5%}
+    .feature-grid{grid-template-columns:1fr}
+    .how{padding:64px 5%}
+    .steps{grid-template-columns:1fr;gap:32px}
+    .steps::before{display:none}
+    .cta-section{padding:64px 5%}
+    .cta-trust{gap:14px}
+    footer{flex-direction:column;align-items:flex-start}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .bubble,.typing-dots{transition:none!important;animation:none!important;opacity:1!important;transform:none!important}
+  }
+</style>
+
+<!-- Non-blocking font load -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&family=Noto+Sans+JP:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&family=Noto+Sans+JP:wght@400;500;600&display=swap" /></noscript>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Zush<span>y</span></a>
+  <a href="mailto:contact@zushyweb.net" class="nav-cta">お問い合わせ</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-copy">
+    <span class="hero-eyebrow">ビジネス向け AI チャットボット</span>
+    <h1>人を増やさず、<br><em>顧客対応を</em><br>スケールする。</h1>
+    <p class="hero-sub">Zushy は、問い合わせ対応・リード獲得・商談のきっかけ作りを24時間自動化します。ヘッドカウントを増やすことなく、売上につながる対話をスケールさせましょう。</p>
+    <div class="hero-actions">
+      <a href="mailto:contact@zushyweb.net" class="btn-primary">まずは相談する</a>
+      <a href="#how-it-works" class="btn-ghost">
+        導入の流れを見る
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="chat-mockup">
+    <div class="chat-topbar">
+      <div class="chat-avatar">Z</div>
+      <div>
+        <div class="chat-agent-name">Zushy アシスタント</div>
+        <div class="chat-status"><span class="online-dot"></span>オンライン</div>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-input-bar">
+      <div class="chat-input-fake" id="fakeInput">なんでも聞いてください…</div>
+      <button class="send-btn" aria-label="送信">
+        <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l12 6L1 13V8.5l8-1.5-8-1.5V1z"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="trust-strip">
+  <p>コストをかけずにサポート体制を強化したい企業のために：</p>
+  <span class="trust-pill">⚡ すぐに導入可能</span>
+  <span class="trust-pill">🌐 24時間365日対応</span>
+  <span class="trust-pill">💬 御社のブランドで話す</span>
+  <span class="trust-pill">🔗 既存ツールと連携</span>
+</div>
+
+<section class="features">
+  <p class="section-label">Zushy でできること</p>
+  <h2 class="section-title">チャットボット1台で、<br>手作業を大幅に削減。</h2>
+  <p class="section-sub">繰り返しの対応を Zushy に任せることで、チームは本当に人が必要な仕事に集中できます。</p>
+  <div class="feature-grid">
+    <div class="feature-card"><div class="feature-icon">💬</div><h3>顧客の質問に即座に回答</h3><p>よくある質問・製品への問い合わせ・サポートリクエストに数秒で対応。待ち時間もチケット積み残しも不要です。</p></div>
+    <div class="feature-card"><div class="feature-icon">🎯</div><h3>リードの選別と引き継ぎ</h3><p>必要な情報を事前に収集し、温まったリードを営業チームへ直接パス。すぐにクローズできる状態で届けます。</p></div>
+    <div class="feature-card"><div class="feature-icon">🕐</div><h3>時間外でも対応を継続</h3><p>ビジネスは17時に終わりません。Zushy も同様です。顧客が必要なときに、いつでもサポートを提供します。</p></div>
+    <div class="feature-card"><div class="feature-icon">🔧</div><h3>御社のコンテンツで学習</h3><p>製品情報・ポリシー・トーンを Zushy が学習。汎用的ではなく、ブランドらしい自然な回答を実現します。</p></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><h3>すべての会話を記録・分析</h3><p>顧客が何を聞いているか、どこで離脱しているか、ボットのパフォーマンスを時系列で把握できます。</p></div>
+    <div class="feature-card"><div class="feature-icon">🔌</div><h3>既存スタックと連携</h3><p>CRM・ヘルプデスク・カレンダーとの連携により、会話するだけでなく実際に業務を動かすボットになります。</p></div>
+  </div>
+</section>
+
+<section class="how" id="how-it-works">
+  <div class="how-inner">
+    <p class="section-label">導入の流れ</p>
+    <h2 class="section-title">ヒアリングから<br>本番稼働まで、スムーズに。</h2>
+    <p class="section-sub">セットアップはすべて私たちが担当します。あなたはビジネスに集中してください。</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3>ビジネスを理解する</h3><p>短いヒアリングで、ユースケース・顧客像・自動化したい業務フローを把握します。</p></div>
+      <div class="step"><div class="step-num">2</div><h3>構築とトレーニング</h3><p>Zushy のチームがチャットボットを設定し、御社のコンテンツで学習させ、既存ツールと接続します。</p></div>
+      <div class="step"><div class="step-num">3</div><h3>本番稼働</h3><p>ウェブサイトやプラットフォームにチャットボットを公開。調整・改善・サポートも継続して対応します。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <p class="section-label">まずはご相談ください</p>
+  <h2 class="section-title">Zushy が御社の問い合わせ対応・リード獲得をどう変えるか、一緒に考えましょう。</h2>
+  <p class="section-sub">私たちは小さくも専門性の高いチームです。御社の状況をお聞かせいただければ、具体的に何ができるかをご説明します。</p>
+  <div class="cta-group">
+    <a href="mailto:contact@zushyweb.net" class="btn-primary-large">無料で相談する →</a>
+  </div>
+  <p class="cta-note">contact@zushyweb.net — 通常、1営業日以内にご返信します。</p>
+  <div class="cta-trust">
+    <div class="cta-trust-item"><svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 7.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>契約不要、まずはご相談から</div>
+    <div class="cta-trust-item"><svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 7.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>御社の業務に合わせてカスタマイズ</div>
+    <div class="cta-trust-item"><svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 7.5l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>導入後もサポートを継続</div>
+  </div>
+</section>
+
+<footer>
+  <a href="#" class="footer-logo">Zush<span>y</span></a>
+  <div class="footer-links"><a href="mailto:contact@zushyweb.net">contact@zushyweb.net</a></div>
+  <p class="copy">© 2026 Zushy. All rights reserved.</p>
+</footer>
+
+<!-- ─────────────────────────────────────────────
+     Chat animation: deferred until browser is idle.
+     requestIdleCallback ensures zero TBT impact;
+     setTimeout(,200) is the Safari/older-browser fallback.
+──────────────────────────────────────────────── -->
+<script>
+function initChat() {
+  var conversation = [
+    { type:'bot',  text:'こんにちは！Zushy アシスタントです。何かお手伝いできることはありますか？', delay:600 },
+    { type:'user', text:'サポートは何時まで対応していますか？', delay:1800 },
+    { type:'bot',  text:'24時間365日対応しています。営業時間外のご質問はすべて私が担当し、必要に応じて担当者へ引き継ぎます。', delay:3200 },
+    { type:'user', text:'チームとの打ち合わせは予約できますか？', delay:4800 },
+    { type:'bot',  text:'もちろんです。今すぐ空き状況を確認できます。ご都合のよい日程を教えていただけますか？📅', delay:6200 },
+  ];
+  var typingTexts = ['サポートは何時まで対応していますか？','チームとの打ち合わせは予約できますか？'];
+  var chatBody = document.getElementById('chatBody');
+  var fakeInput = document.getElementById('fakeInput');
+  var typingIdx = 0;
+
+  function createBubble(msg) {
+    var row = document.createElement('div');
+    row.className = 'bubble-row' + (msg.type === 'user' ? ' user' : '');
+    if (msg.type === 'bot') {
+      var av = document.createElement('div');
+      av.className = 'bubble-mini-avatar';
+      row.appendChild(av);
+    }
+    var bub = document.createElement('div');
+    bub.className = 'bubble ' + (msg.type === 'user' ? 'user-msg' : 'bot');
+    bub.textContent = msg.text;
+    row.appendChild(bub);
+    chatBody.appendChild(row);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ bub.classList.add('visible'); }); });
+  }
+
+  function showTyping() {
+    var row = document.createElement('div');
+    row.className = 'bubble-row';
+    var av = document.createElement('div'); av.className = 'bubble-mini-avatar';
+    var dots = document.createElement('div'); dots.className = 'typing-dots';
+    dots.innerHTML = '<span></span><span></span><span></span>';
+    row.appendChild(av); row.appendChild(dots);
+    chatBody.appendChild(row);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ dots.classList.add('visible'); }); });
+    return row;
+  }
+
+  function animateInputTyping(text, cb) {
+    fakeInput.textContent = '';
+    var i = 0;
+    var iv = setInterval(function() {
+      if (i < text.length) { fakeInput.textContent += text[i]; i++; }
+      else { clearInterval(iv); cb && cb(); }
+    }, 55);
+  }
+
+  function runConversation(idx) {
+    if (idx >= conversation.length) {
+      setTimeout(function() {
+        chatBody.innerHTML = '';
+        typingIdx = 0;
+        fakeInput.textContent = 'なんでも聞いてください…';
+        runConversation(0);
+      }, 3500);
+      return;
+    }
+    var msg = conversation[idx];
+    var wait = idx === 0 ? msg.delay : (msg.delay - conversation[idx - 1].delay);
+    setTimeout(function() {
+      if (msg.type === 'user') {
+        animateInputTyping(typingTexts[typingIdx] || msg.text, function() {
+          typingIdx++;
+          setTimeout(function() {
+            fakeInput.textContent = 'なんでも聞いてください…';
+            createBubble(msg);
+            runConversation(idx + 1);
+          }, 300);
+        });
+      } else {
+        var typingRow = showTyping();
+        setTimeout(function() {
+          typingRow.remove();
+          createBubble(msg);
+          runConversation(idx + 1);
+        }, 900);
+      }
+    }, wait);
+  }
+
+  runConversation(0);
+}
+
+// Run only when the browser has spare capacity after first paint
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(initChat, { timeout: 2000 });
+} else {
+  setTimeout(initChat, 200);
+}
+</script>
+
+<!-- Zapier Chatbot — loaded after page is interactive -->
+<script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+<zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmqb6ikyh005ccznba8v51yk0'></zapier-interfaces-chatbot-embed>
+
+</body>
+</html>
